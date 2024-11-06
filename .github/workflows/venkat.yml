@@ -37,15 +37,16 @@ jobs:
         id: get-timestamp
         run: echo "timestamp=$(date +'%Y-%m-%d-%H-%M')" >> $GITHUB_ENV
 
+      - name: Set working directory via script  
+        run: bash ./scripts/set_directory.sh 
+
       - name: Build, tag, and push the image to Amazon ECR
         id: build-image
-        working-directory: ${{ github.event.inputs.directory }}
+        working-directory: ${{ env.working_directory }}
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
           IMAGE_TAG: ${{ github.event.inputs.directory }}-${{ env.commit_hash }}-${{ env.timestamp }}
-        run: |
-          # Remove any special characters from IMAGE_TAG
-          IMAGE_TAG=$(echo "$IMAGE_TAG" | tr -cd '[:alnum:]_-')
+        run: |          
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
