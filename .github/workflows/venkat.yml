@@ -2,7 +2,7 @@ name: Push the Docker image to AWS ECR Repo
 on:
   push:
     branches:
-      - dev
+      - main
   workflow_dispatch:
     inputs:
       directory:
@@ -23,7 +23,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-north-1
+          aws-region: ap-south-1
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -31,7 +31,7 @@ jobs:
 
       - name: Get commit hash
         id: get-commit-hash
-        run: echo "commit-hash=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+        run: echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - name: Get timestamp
         id: get-timestamp
@@ -43,7 +43,9 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-          IMAGE_TAG: ${{ github.event.inputs.directory }}-${{ env.commit-hash }}-${{ env.timestamp }}
+          IMAGE_TAG: "${{ github.event.inputs.directory }}-${{ env.commit_hash }}-${{ env.timestamp }}"
         run: |
+          # Remove any special characters from IMAGE_TAG
+          IMAGE_TAG=$(echo "$IMAGE_TAG" | tr -cd '[:alnum:]_-')
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
