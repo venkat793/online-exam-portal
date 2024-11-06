@@ -2,12 +2,14 @@
 # set_directory.sh
 # Script to set the working directory dynamically
 
-# Check if a directory was passed as an argument
-if [ -z "$1" ]; then
-  echo "No directory provided. Using default."
+# Prompt the user to enter the working directory
+read -p "Enter the working directory (or press Enter to use './backend'): " input_directory
+
+# Use the provided directory or default to "./backend" if none was given
+if [ -z "$input_directory" ]; then
   working_directory="./backend"  # Default directory
 else
-  working_directory=$1  # Use the directory passed as argument
+  working_directory=$input_directory  # User-provided directory
 fi
 
 # Export it as an environment variable for use in GitHub Actions
