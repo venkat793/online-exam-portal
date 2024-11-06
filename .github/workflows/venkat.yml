@@ -34,12 +34,20 @@ jobs:
       - name: Detect changed directory
         id: detect-changes
         run: |
+
+              # Check if there is a previous commit
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            DIFF_TARGET="HEAD^"
+          else
+            DIFF_TARGET="HEAD"
+          fi
+
           if git diff --name-only HEAD^ HEAD | grep -q '^backend/'; then
             echo "directory=backend" >> $GITHUB_ENV
           elif git diff --name-only HEAD^ HEAD | grep -q '^frontend/'; then
             echo "directory=frontend" >> $GITHUB_ENV
           elif git diff --name-only HEAD^ HEAD | grep -q '^user-portal-frontend/'; then
-            echo "directory=user-frontend" >> $GITHUB_ENV
+            echo "directory=user-portal-frontend" >> $GITHUB_ENV
           else
             echo "No changes in specified directories."
             exit 1
