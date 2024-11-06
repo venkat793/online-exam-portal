@@ -38,11 +38,12 @@ jobs:
             echo "directory=backend" >> $GITHUB_ENV
           elif git diff --name-only HEAD^ HEAD | grep -q '^frontend/'; then
             echo "directory=frontend" >> $GITHUB_ENV
-          elif git diff --name-only HEAD^ HEAD | grep -q '^user-frontend/'; then
+          elif git diff --name-only HEAD^ HEAD | grep -q '^user-portal-frontend/'; then
             echo "directory=user-frontend" >> $GITHUB_ENV
           else
             echo "No changes in specified directories."
             exit 1
+          fi  
 
       - name: Build, tag, and push the image to Amazon ECR
         id: build-image
