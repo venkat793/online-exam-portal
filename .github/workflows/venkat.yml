@@ -3,12 +3,7 @@ on:
   push:
     branches:
       - dev
-  workflow_dispatch:
-    inputs:
-      directory:
-        description: 'Enter the directory where the Dockerfile is located'
-        required: true
-        default: './backend'
+
 
 jobs:
   Build:
@@ -46,7 +41,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-          IMAGE_TAG: ${{ env.working_directory }}-${{ env.commit_hash }}-${{ env.timestamp }}
+          IMAGE_TAG: ${{ env.commit_hash }}-${{ env.timestamp }}
         run: |          
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
