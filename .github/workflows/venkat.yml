@@ -43,7 +43,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-          IMAGE_TAG: ${{ github.event.inputs.directory }}-${{ env.commit_hash }}-${{ env.timestamp }}
+          IMAGE_TAG: ${{ github.event.inputs.directory }}1-${{ env.commit_hash }}-${{ env.timestamp }}
         run: |
           # Remove any special characters from IMAGE_TAG
           IMAGE_TAG=$(echo "$IMAGE_TAG" | tr -cd '[:alnum:]_-')
