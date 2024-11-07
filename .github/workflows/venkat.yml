@@ -39,11 +39,11 @@ jobs:
 
       - name: Build, tag, and push the image to Amazon ECR
         id: build-image
-        working-directory: ${{ github.event.inputs.directory }}
+        working-directory: ${{ github.event.inputs.directory || './backend' }}
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-          IMAGE_TAG: ${{ github.event.inputs.directory }}-${{ env.commit_hash }}-${{ env.timestamp }}
+          IMAGE_TAG: ${{ github.event.inputs.directory || './backend' }}-${{ env.commit_hash }}-${{ env.timestamp }}
         run: |
 
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
