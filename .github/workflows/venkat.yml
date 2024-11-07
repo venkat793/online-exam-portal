@@ -4,12 +4,11 @@ on:
     branches:
       - dev
   workflow_dispatch:
-        inputs:
-          directory:
-            description: 'Enter the directory where the Dockerfile is located'
-            required: true
-            default: './backend'      
-
+    inputs:
+      directory:
+        description: 'Enter the directory where the Dockerfile is located'
+        required: true
+        default: './backend'      
 
 jobs:
   Build:
@@ -32,13 +31,11 @@ jobs:
 
       - name: Get commit hash
         id: get-commit-hash
-        run: echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+        run: echo "::set-output name=commit_hash::$(git rev-parse --short HEAD)"
 
       - name: Get timestamp
         id: get-timestamp
-        run: echo "timestamp=$(date +'%Y-%m-%d-%H-%M')" >> $GITHUB_ENV
-
-
+        run: echo "::set-output name=timestamp::$(date +'%Y-%m-%d-%H-%M')"
 
       - name: Build, tag, and push the image to Amazon ECR
         id: build-image
@@ -46,7 +43,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-          IMAGE_TAG: ${{ github.event.inputs.directory }}-${{ env.commit_hash }}-${{ env.timestamp }}
+          IMAGE_TAG: ${{ github.event.inputs.directory }}-${{ steps.get-commit-hash.outputs.commit_hash }}-${{ steps.get-timestamp.outputs.timestamp }}
         run: |          
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
