@@ -37,14 +37,22 @@ jobs:
         id: get-timestamp
         run: echo "timestamp=$(date +'%Y-%m-%d-%H-%M')" >> $GITHUB_ENV
 
+      - name: Set working directory and image tag
+        id: setup-vars
+        run: |
+          DIRECTORY="${{ github.event.inputs.directory }}"
+          WORKING_DIRECTORY=${DIRECTORY:-'./backend'}
+          echo "working_directory=$WORKING_DIRECTORY" >> $GITHUB_ENV
+          IMAGE_TAG="backend-${commit_hash}-${timestamp}"
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+
       - name: Build, tag, and push the image to Amazon ECR
         id: build-image
-        working-directory: ${{ github.event.inputs.directory || './backend' }}
+        working-directory: ${{ env.working_directory }}
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-          IMAGE_TAG: ${{ github.event.inputs.directory || './backend' }}-${{ env.commit_hash }}-${{ env.timestamp }}
+          IMAGE_TAG: ${{ env.IMAGE_TAG }}
         run: |
-
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
