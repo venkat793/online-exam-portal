@@ -14,6 +14,10 @@ jobs:
   Build:
     name: Build
     runs-on: ubuntu-latest
+    env:
+      # Set a default directory to use when triggered by push
+      DIRECTORY: ${{ github.event.inputs.directory || './backend' }}
+      
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -39,11 +43,11 @@ jobs:
 
       - name: Build, tag, and push the image to Amazon ECR
         id: build-image
-        working-directory: ${{ github.event.inputs.directory }}
+        working-directory: ${{ env.DIRECTORY }}
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-          IMAGE_TAG: ${{ github.event.inputs.directory }}1-${{ env.commit_hash }}-${{ env.timestamp }}
+          IMAGE_TAG: ${{ env.DIRECTORY }}-${{ env.commit_hash }}-${{ env.timestamp }}
         run: |
           # Remove any special characters from IMAGE_TAG
           IMAGE_TAG=$(echo "$IMAGE_TAG" | tr -cd '[:alnum:]_-')
