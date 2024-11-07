@@ -43,7 +43,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-          IMAGE_TAG: "${{ github.event.inputs.directory }}-${{ steps.get-commit-hash.outputs.commit_hash }}-${{ steps.get-timestamp.outputs.timestamp }}"
+          IMAGE_TAG: ${{ github.event.inputs.directory }}-${{ steps.get-commit-hash.outputs.commit_hash }}-${{ steps.get-timestamp.outputs.timestamp }}
         run: |          
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
